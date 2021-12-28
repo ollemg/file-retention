@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "retention_files"
+version = "0.1.0"
+description = "Delete files based on predefined dates"
+authors = ["Gabriel de Mello Barbosa"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+PyYAML = "^6.0"
+click = "^8.0.3"
+
+[tool.poetry.dev-dependencies]
+black = "^21.12b0"
+ipython = "^7.30.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

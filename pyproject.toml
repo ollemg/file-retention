@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "retention_files"
-version = "0.1.0"
+name = "file_retention"
+version = "0.2.0"
 description = "Delete files based on predefined dates"
 authors = ["Gabriel de Mello Barbosa"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7"
 PyYAML = "^6.0"
 click = "^8.0.3"
 

@@ -21,33 +21,30 @@ def main(retention, extension, path, delete):
     days_ago = today - timedelta(days=retention)
     home = expanduser("~")
     output_yaml = os.path.join(home, ".file_retention")
-    if os.path.exists(output_yaml):
-        os.makedirs(output_yaml, exist_ok = True)
-        click.echo(f'{space}\nDiretório criado: {output_yaml}')
-    else:
-        click.echo(f'{space}\nDiretório já existe: {output_yaml}')
+    os.makedirs(output_yaml, exist_ok = True)
+    click.echo(f'{space}\nDiretório criado: {output_yaml}')
 
     def create_yaml(dictionary, date):
-        """ recebe um dicionario e uma data para montar o arquivo yaml"""
+        """Recebe um dicionario e uma data para montar o arquivo yaml"""
         full_path = os.path.join(output_yaml, f'{date}.yml')
-        if len(dictionary) == 2:
-            click.echo(space)
-            click.echo(f"Não há arquivos no diretorio ou não foi passado um diretorio.")
-        else:
+        if len(dictionary["arquivos"]) > 0:
             with open(full_path, 'w') as yaml_file:
                 yaml.dump(dictionary, yaml_file, default_flow_style=False)
             click.echo(space)
             click.echo(f'Arquivo exportado: {full_path}')
+        else:
+            click.echo(space)
+            click.echo(f"Não há arquivos no diretório ou não foi passado um diretorio.")
 
     def get_files(fullpath):
-        """ Recebe um diretorio e coleta todos os arquivos que existe no diretorio recursivamente e salva em uma lista"""
+        """Recebe um diretorio e coleta todos os arquivos que existe no diretorio recursivamente e salva em uma lista"""
         values = [f for f in glob.glob(f"{fullpath}**/*.{extension}", recursive=True)]
         count = len(values)
         click.echo(f'{space}\n{count} arquivos encontrados!')
         return values
 
     def create_dict(date, fullpath):
-        """ recebe uma data e cria um dicionario com a data e a lista de arquivos encontrados na funcao get_files() """
+        """Recebe uma data e cria um dicionario com a data e a lista de arquivos encontrados na funcao get_files() """
         dicts = {}
         dicts["date"] = date
         dicts["arquivos"] = get_files(fullpath)
@@ -69,7 +66,6 @@ def main(retention, extension, path, delete):
     def delete_yaml(files):
         ...
         
-
     def delete_files(date):
         """Recebe uma data deleta os arquivos consultando o yaml ~/.file_retention/yyyy-mm-dd.yml"""
         if delete:

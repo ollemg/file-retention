@@ -130,3 +130,6 @@ dmypy.json
 
 # code
 *.code-workspace
+
+# config file
+config.yaml

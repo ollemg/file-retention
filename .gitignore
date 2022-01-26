@@ -132,4 +132,5 @@ dmypy.json
 *.code-workspace
 
 # config file
-mail.yaml
+*.yaml
+.vscode/*

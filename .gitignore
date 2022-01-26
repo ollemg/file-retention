@@ -132,4 +132,4 @@ dmypy.json
 *.code-workspace
 
 # config file
-config.yaml
+mail.yaml

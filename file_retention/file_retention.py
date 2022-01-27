@@ -37,6 +37,11 @@ def cli():
         $ python3 -m file_retention snapshot /tmp/create_files/ -e txt\n
         $ python3 -m file_retention delete -r 5 -y\n
         $ python3 -m file_retention mail ~/.file_retention/mail.yml -r 5\n
+    For more help:\n
+        python3 -m file_retention --help\n
+        python3 -m file_retention snapshot --help\n
+        python3 -m file_retention mail --help\n
+        python3 -m file_retention delete --help\n
     """
     ...
 

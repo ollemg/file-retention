@@ -1,89 +1,126 @@
-#!/usr/bin/env python
-import glob
+#!/usr/bin/env python3
+
+# import glob
 import os
 from os.path import expanduser
 from datetime import date, timedelta
-import yaml
-from yaml.loader import SafeLoader
 import click
+import logging
+from .functions import (
+    create_yaml,
+    get_files,
+    create_dict,
+    read_yaml,
+    delete_files,
+    today,
+    output_yaml_file,
+    trace,
+    send_mail,
+    setup,
+)
+
+home = expanduser("~")
+logging.basicConfig(
+    filename=f"{home}/file_retention.log",
+    level=logging.INFO,
+    format="%(asctime)s  - %(levelname)s - %(funcName)s - %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+)
 
 
-@click.command()
-@click.option('--retention','-r', default=15, help='Number of days. Default value 15')
-@click.option('--extension','-e', default="*", help='Extension of files. Default value *')
-@click.option('--path','-p', help='Path')
-@click.option('--delete','-d', default=False ,help='For delete files', is_flag=True)
+@click.group("cli")
+def cli():
+    """Delete files from a directory based on a specific date \n
+    First of all, run:\n
+        $ python3 -m file_retention install\n
+    How to use:\n
+        $ python3 -m file_retention snapshot /tmp/create_files/ -e txt\n
+        $ python3 -m file_retention delete -r 5 -y\n
+        $ python3 -m file_retention mail ~/.file_retention/mail.yml -r 5\n
+    """
+    ...
 
-def main(retention, extension, path, delete):
-    """ Delete files based on predefined dates """
-    space = "--------------------------------------------------------------------"
-    today = date.today()
-    days_ago = today - timedelta(days=retention)
-    home = expanduser("~")
-    output_yaml = os.path.join(home, ".file_retention")
-    os.makedirs(output_yaml, exist_ok = True)
-    click.echo(f'{space}\nDiretório criado: {output_yaml}')
 
-    def create_yaml(dictionary, date):
-        """Recebe um dicionario e uma data para montar o arquivo yaml"""
-        full_path = os.path.join(output_yaml, f'{date}.yml')
-        if len(dictionary["arquivos"]) > 0:
-            with open(full_path, 'w') as yaml_file:
-                yaml.dump(dictionary, yaml_file, default_flow_style=False)
-            click.echo(space)
-            click.echo(f'Arquivo exportado: {full_path}')
-        else:
-            click.echo(space)
-            click.echo(f"Não há arquivos no diretório ou não foi passado um diretorio.")
+@cli.command(
+    "snapshot",
+    short_help="Capture all files from directory recursively and save to a yaml file ",
+)
+@click.argument("path", type=click.Path(exists=True))
+@click.option(
+    "--extension",
+    "-e",
+    default="*",
+    help="Files Extension. Default value *. Ex: mp4",
+    required=True,
+)
+def snapshot(path, extension):
+    logging.info("Função iniciada")
+    """Capture all files from directory recursively and save to a yaml file\n
+    Ex:\n
+        $ python3 -m file_retention snapshot /tmp/create_files/ -e md"""
+    files_now = get_files(path, extension)
+    dicts = create_dict(files_now, path)
+    create_yaml(dicts, today(), path)
 
-    def get_files(fullpath):
-        """Recebe um diretorio e coleta todos os arquivos que existe no diretorio recursivamente e salva em uma lista"""
-        values = [f for f in glob.glob(f"{fullpath}**/*.{extension}", recursive=True)]
-        count = len(values)
-        click.echo(f'{space}\n{count} arquivos encontrados!')
-        return values
 
-    def create_dict(date, fullpath):
-        """Recebe uma data e cria um dicionario com a data e a lista de arquivos encontrados na funcao get_files() """
-        dicts = {}
-        dicts["date"] = date
-        dicts["arquivos"] = get_files(fullpath)
-        return dicts
+@cli.command("delete", short_help="Delete the files")
+@click.option(
+    "--retention",
+    "-r",
+    type=int,
+    help="Days in numbers. Ex: 1 = a day ago",
+    required=True,
+)
+@click.option(
+    "--yes", "-y", default=False, help="Confirm file deletion", is_flag=True
+)
+def delete(yes, retention):
+    logging.info("Função iniciada")
+    """Delete the files\n
+    Obs: Use -y / --yes with care\n
+    Ex:\n
+        $ python3 -m file_retention delete -r 5 -y\n
+    """
+    days_ago = today() - timedelta(days=retention)
+    files_ago = read_yaml(days_ago, "arquivos")
+    filename = os.path.join(output_yaml_file(), f"{days_ago}.yml")
+    if yes:
+        delete_files(days_ago, files_ago, retention)
 
-    def read_yaml(date, key):
-        """Recebe uma data e uma chave para ler o arquivo yaml"""
-        full_path = os.path.join(output_yaml, f'{date}.yml')
-        if os.path.exists(full_path):
-            click.echo(f"{space}\nArquivo {full_path} Encontrado!")
-            with open(full_path, "r") as config:
-                data = yaml.load(config, Loader=SafeLoader)
-                data = data[key]
-                click.echo(f"{space}\nLendo o arquivo: {full_path}")
-            return data
-        else:
-            click.echo(f"{space}\nAinda não existe o arquivo {full_path}.")
+    else:
+        click.echo(f"{trace()}\nArquivos não foram deletados.\n{trace()}")
+        logging.info("Arquivos não foram deletados.")
 
-    def delete_yaml(files):
-        ...
-        
-    def delete_files(date):
-        """Recebe uma data deleta os arquivos consultando o yaml ~/.file_retention/yyyy-mm-dd.yml"""
-        if delete:
-            full_path = os.path.join(output_yaml, f'{date}.yml')
-            if os.path.exists(full_path):
-                files = read_yaml(date, "arquivos")
-                click.echo(f"{space}\nOs arquivos de {retention} dias atrás serão excluídos!!\n{space}")
-                for f in files:
-                    if os.path.exists(f):
-                        os.remove(f"{f}")
-                        click.echo(f"Arquivo removido: {f}")
-                    else:
-                        click.echo(f"O Arquivo {f} não existe mais")
-                click.echo(space)
-            else:
-                click.echo(f"{space}\nO arquivo {full_path} não existe ainda.\n{space}")
-        else:
-            click.echo(f"{space}\nNada será deletado.\n{space}")
 
-    create_yaml(create_dict(today, path), today)
-    delete_files(days_ago)
+@cli.command(
+    "mail", short_help="Send the emails based on a yml configuration file"
+)
+@click.argument("mail_file", type=click.Path(exists=True))
+@click.option(
+    "--retention",
+    "-r",
+    type=int,
+    help="Days in numbers. Ex: 1 = a day ago",
+    required=True,
+)
+def mail(mail_file, retention):
+    logging.info("Função iniciada")
+
+    """Send the emails based on a yml configuration file\n
+    Obs: When file_retention is installed, it automatically creates the file
+    ~/.file_retention/mail.yaml so just edit the file with the necessary
+    email conformations\n
+    Ex:\n
+        $ python3 -m file_retention mail ~/.file_retention/mail.yml -r 5
+    """
+    send_mail(mail_file, retention)
+
+
+@cli.command(
+    "install",
+    short_help="Creates the directories and files needed for the CLI to work",
+)
+def install():
+    logging.info("Função iniciada")
+    """Create the ~/.file_retention directory and the configuration file for sending emails ~/.file_retention/mail.yml"""
+    setup()

@@ -1,4 +1,4 @@
-from .file_retention import main
+from .file_retention import cli
 
-if __name__ == '__main__':
-   main()
+if __name__ == "__main__":
+    cli()

@@ -138,7 +138,7 @@ Os arquivos coletados no dia de hoje estao no arquivo {output_yaml_file()}/{toda
                 smtplib.SMTPServerDisconnected,
                 TypeError,
                 KeyError,
-            ):
+            ) as error:
                 click.echo(f"{trace()}\nErro ao enviar o e-mail!!\n{trace()}")
                 click.echo(
                     f"Verificar arquivo de configuração: {filename}\n{trace()}"
@@ -146,6 +146,7 @@ Os arquivos coletados no dia de hoje estao no arquivo {output_yaml_file()}/{toda
                 logging.error(
                     f"Erro ao enviar o e-mail!! Verificar arquivo de configuração: {filename}"
                 )
+                logging.error(error)
     else:
         click.echo(
             f"{trace()}\nArquivo {filename} de configuração não encontado.\n{trace()}"

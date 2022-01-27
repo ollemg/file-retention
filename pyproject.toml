@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "file_retention"
-version = "0.3.0"
+version = "0.3.1"
 description = "Delete files based on predefined dates"
 authors = ["Gabriel de Mello Barbosa"]
 repository = "https://github.com/ollemg/file_retention"

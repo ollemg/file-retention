@@ -27,8 +27,21 @@ python3 -m file_retention delete -r 15 -y
 
 
 Enviar e-mail:
+
+Obs: quando executar `python3 -m file_retention install` automaticamente é
+criado o arquivo ~/.file_retention/mail.yml com as chaves necessárias para enviar o e-mail
 ~~~
 python3 -m file_retention mail ~/.file_retention/mail.yml -r 15
+~~~
+
+Arquivo ~/.file_retention/mail.yml:
+~~~
+password: ''
+port: 25
+receiver: ''
+sender: ''
+server: localhost
+subject: ''
 ~~~
 
 Para mais informaões:

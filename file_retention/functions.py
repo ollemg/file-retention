@@ -138,6 +138,7 @@ Os arquivos coletados no dia de hoje estao no arquivo {output_yaml_file()}/{toda
                 smtplib.SMTPServerDisconnected,
                 TypeError,
                 KeyError,
+                smtplib.SMTPRecipientsRefused,
             ) as error:
                 click.echo(f"{trace()}\nErro ao enviar o e-mail!!\n{trace()}")
                 click.echo(
@@ -171,7 +172,7 @@ def setup():
         "sender": "",
         "receiver": "",
         "password": "",
-        "subject": "Arquivos que serao excluidos hoje",
+        "subject": "",
         "server": "",
         "port": 25,
     }

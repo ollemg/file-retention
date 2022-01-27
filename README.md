@@ -1,24 +1,40 @@
 # file-retention
-CLI for file retention based on anywhere date
+CLI para retenção de arquivos com base em qualquer data 
 
-Dependencias:
-  - poetry
-
-## install:
-
+Como instalar:
 ~~~
-poetry install
+python3 -m pip install --upgrade pip
+python3 -m pip install file_retention
 ~~~
 
-## How to use:
+Como utilizar:
 
-obs: in --path / at the end to be recursive 
-
+Primeiro é necessário executar com o comando install para 
+criar os diretórios e arquivos de configuração necessários
 ~~~
-python3 -m file_retention --extension "pdf" -path /opt/teste/
+python3 -m file_retention install
 ~~~
 
-a .file_retention directory in the user's home will be created with .yml files 
-
+Tirar um snapshot dos arquivos recursivamente:
 ~~~
+python3 -m file_retention snapshot /tmp/create_files/ -e ini
+~~~
+
+Deletar os arquivos:
+~~~
+python3 -m file_retention delete -r 15 -y
+~~~
+
+
+Enviar e-mail:
+~~~
+python3 -m file_retention mail ~/.file_retention/mail.yml -r 15
+~~~
+
+Para mais informaões:
+~~~
+python3 -m file_retention --help
+python3 -m file_retention snapshot --help
+python3 -m file_retention mail --help
+python3 -m file_retention delete --help
 ~~~

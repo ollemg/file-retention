@@ -23,7 +23,13 @@ def create_yaml(dictionary, date, path):
         full_path = os.path.join(output_yaml_file(), f"{date}.yml")
         if len(dictionary["arquivos"]) > 0:
             with open(full_path, "w") as yaml_file:
-                yaml.dump(dictionary, yaml_file, default_flow_style=False)
+                yaml.dump(
+                    dictionary,
+                    yaml_file,
+                    default_flow_style=False,
+                    encoding="utf8",
+                    allow_unicode=True,
+                )
             click.echo(f"{trace()}\nArquivo exportado: {full_path}\n{trace()}")
             logging.info(f"Arquivo exportado: {full_path}")
             logging.debug(
@@ -77,7 +83,10 @@ def read_yaml(date, key):
         click.echo(f"{trace()}\nArquivo encontrado: {full_path}")
         logging.info(f"Arquivo encontrado: {full_path}")
         with open(full_path, "r") as yaml_file:
-            data = yaml.load(yaml_file, Loader=SafeLoader)
+            data = yaml.load(
+                yaml_file,
+                Loader=SafeLoader,
+            )
             if type(data) is dict:
                 data = data[key]
         return data
